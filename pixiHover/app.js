@@ -1,10 +1,22 @@
+import cover from './../helpers/cover.js';
+// import * as aliases from './../helpers/pixiAliases.js';
+import fxGlitch from './fxGlitch.js';
+
+//Aliases
+let Application = PIXI.Application,
+  loader = PIXI.loader,
+  resources = PIXI.loader.resources,
+  Sprite = PIXI.Sprite,
+  filters = PIXI.filters;
+
 class pixiHover {
   constructor(options) {
     // Default options
     const defaults = {
       className: 'pixiHover',
       container: null,
-      imageUrl: null
+      imageUrl: null,
+      effect: null
     };
 
     // Assign passed options to class
@@ -13,7 +25,7 @@ class pixiHover {
       this[prop] = opts[prop];
     });
 
-    if (!this.container || !this.imageUrl) {
+    if (!this.container || !this.imageUrl || !this.effect) {
       console.warn(`${this.className}: missing options`);
       return;
     }
@@ -25,66 +37,52 @@ class pixiHover {
     this.containerWidth = this.container.offsetWidth;
     this.containerHeight = this.container.offsetHeight;
 
-    this.app = new PIXI.Application({
+    this.app = new Application({
       width: this.containerWidth,
-      height: this.containerHeight
+      height: this.containerHeight,
+      transparent: true
     });
 
-    PIXI.loader.add(this.imageUrl).load(() => {
-      this.sprite = new PIXI.Sprite(
-        PIXI.loader.resources[this.imageUrl].texture
+    loader.add(this.imageUrl).load(() => {
+      this.sprite = new Sprite(loader.resources[this.imageUrl].texture);
+      const sizeAndPosition = cover(
+        this.containerWidth,
+        this.containerHeight,
+        this.sprite.width,
+        this.sprite.height
       );
-      const sizeAndPosition = this.getCoverProperties(this.sprite);
+
       this.sprite.width = sizeAndPosition.width;
       this.sprite.height = sizeAndPosition.height;
       this.sprite.x = sizeAndPosition.x;
       this.sprite.y = sizeAndPosition.y;
+
+      this.sprite.interactive = true;
+
       this.app.stage.addChild(this.sprite);
       this.container.appendChild(this.app.view);
 
-      this.addEventListener();
+      this.addEffect();
+
     });
+
   }
 
-  addEventListener() {
-    this.sprite.interactive = true;
-    this.sprite.on('pointermove', this.animate);
-  }
-
-  animate(event) {
-    console.log(event);
-  }
-
-  getCoverProperties(sprite) {
-    // https://www.reddit.com/r/pixijs/comments/5nkr3t/background_image_cover/
-    const imageRatio = sprite.width / sprite.height;
-    const containerRatio = this.containerWidth / this.containerHeight;
-
-    if (containerRatio > imageRatio) {
-      return {
-        height: sprite.height / (sprite.width / this.containerWidth),
-        width: this.containerWidth,
-        x: 0,
-        y:
-          (this.containerHeight -
-            sprite.height / (sprite.width / this.containerWidth)) /
-          2
-      };
+  addEffect() {
+    if (this.effect === 'glitch') {
+      fxGlitch(this.app, this.sprite);
     } else {
-      return {
-        width: sprite.width / (sprite.height / this.containerHeight),
-        height: this.containerHeight,
-        y: 0,
-        x:
-          (this.containerWidth -
-            sprite.width / (sprite.height / this.containerHeight)) /
-          2
-      };
+      console.warn('no filter found');
     }
+  }
+
+  destroy() {
+    this.sprite.filters = null;
   }
 }
 
 new pixiHover({
   container: document.querySelector('.canvas-container'),
-  imageUrl: './../assets/img/fashion01.jpg'
+  imageUrl: 'fashion01.jpg',
+  effect: 'glitch'
 });
