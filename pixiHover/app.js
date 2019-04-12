@@ -1,6 +1,7 @@
 import cover from './../helpers/cover.js';
 import fxGlitch from './fxGlitch.js';
 import fxDisplacement from './fxDisplacement.js';
+import fxBulge from './fxBulgePinch.js';
 
 //Aliases
 let Application = PIXI.Application,
@@ -72,7 +73,9 @@ class pixiHover {
       fxGlitch(this.app, this.sprite);
     } else if (this.effect === 'displacement') {
       fxDisplacement(this.app, this.sprite, this.map);
-    } else {
+    } else if (this.effect === 'bulge') {
+      fxBulge(this.app, this.sprite, this.container);
+    }else {
       console.warn('no filter found');
     }
   }
@@ -86,6 +89,6 @@ class pixiHover {
 new pixiHover({
   container: document.querySelector('.canvas-container'),
   imageUrl: 'fashion01.jpg',
-  effect: 'displacement',
+  effect: 'bulge',
   map: 'displacement01.png'
 });
