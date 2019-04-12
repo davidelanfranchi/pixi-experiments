@@ -1,6 +1,6 @@
 import cover from './../helpers/cover.js';
-// import * as aliases from './../helpers/pixiAliases.js';
 import fxGlitch from './fxGlitch.js';
+import fxDisplacement from './fxDisplacement.js';
 
 //Aliases
 let Application = PIXI.Application,
@@ -16,7 +16,8 @@ class pixiHover {
       className: 'pixiHover',
       container: null,
       imageUrl: null,
-      effect: null
+      effect: null,
+      map: null
     };
 
     // Assign passed options to class
@@ -25,7 +26,7 @@ class pixiHover {
       this[prop] = opts[prop];
     });
 
-    if (!this.container || !this.imageUrl || !this.effect) {
+    if (!this.container || !this.imageUrl || !this.effect || (this.effect === 'displacement' && !this.map)) {
       console.warn(`${this.className}: missing options`);
       return;
     }
@@ -63,14 +64,14 @@ class pixiHover {
       this.container.appendChild(this.app.view);
 
       this.addEffect();
-
     });
-
   }
 
   addEffect() {
     if (this.effect === 'glitch') {
       fxGlitch(this.app, this.sprite);
+    } else if (this.effect === 'displacement') {
+      fxDisplacement(this.app, this.sprite, this.map);
     } else {
       console.warn('no filter found');
     }
@@ -81,8 +82,10 @@ class pixiHover {
   }
 }
 
+// Effects: glitch, displacement
 new pixiHover({
   container: document.querySelector('.canvas-container'),
   imageUrl: 'fashion01.jpg',
-  effect: 'glitch'
+  effect: 'displacement',
+  map: 'displacement01.png'
 });
