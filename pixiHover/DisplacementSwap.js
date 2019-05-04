@@ -69,8 +69,6 @@ class DisplacementSwap {
 		);
 
 		this.addSpriteAsCoverImage(this.displacementMapSprite);
-		this.displacementMapSprite.x = 2;
-		this.displacementMapSprite.y = 2;
 
 		this.filter = new PIXI.filters.DisplacementFilter(
 			this.displacementMapSprite
@@ -108,17 +106,20 @@ class DisplacementSwap {
 	addEffect() {
 		this.sprite2.alpha = 0;
 
+		this.transitionTime = 0.5;
+
 		this.tl = new TimelineLite({ paused: true })
 			.addLabel("start")
-			.to(this.sprite2, 1, { alpha: 1 }, "start")
-			.to(this.sprite1, 0.5, { alpha: 0 }, "start")
-			.to(
-				this.displacementMapSprite,
-				0.5,
-				{ y: this.displacementMapSprite.y - 200 },
-				"start"
-			)
-			.to(this.filter.scale, 1, { x: 0, y: 0 }, "start")
+			.to(this.sprite2, this.transitionTime, { alpha: 1 }, "start")
+			.to(this.sprite1, this.transitionTime, { alpha: 0 }, "start")
+			// .fromTo(
+			// 	this.displacementMapSprite,
+			// 	this.transitionTime,
+			// 	{ y: this.displacementMapSprite.y + 100 },
+			// 	{ y: this.displacementMapSprite.y },
+			// 	"start"
+			// )
+			.to(this.filter.scale, this.transitionTime, { x: 0, y: 0 }, "start")
 			.addLabel("end");
 
 		this.bindedOnMouseEnter = this.onMouseEnter.bind(this);
@@ -146,5 +147,5 @@ const swap = new DisplacementSwap({
 	container: document.querySelector(".canvas-container"),
 	sprite1Url: "truetopia-team-01-640.jpg",
 	sprite2Url: "truetopia-team-02-640.jpg",
-	displacementMapUrl: "displacement/15.jpg"
+	displacementMapUrl: "displacement/10.jpg"
 });
